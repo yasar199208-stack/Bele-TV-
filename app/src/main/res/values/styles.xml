@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.Leanback" parent="Theme.Leanback.Browse">
+        <item name="colorPrimary">#1A1A2E</item>
+        <item name="colorAccent">#E94560</item>
+        <item name="defaultBrandColor">#1A1A2E</item>
+        <item name="defaultSearchColor">#E94560</item>
+    </style>
+</resources>
