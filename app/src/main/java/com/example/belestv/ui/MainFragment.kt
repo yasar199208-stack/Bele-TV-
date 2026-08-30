@@ -20,7 +20,6 @@ import kotlinx.coroutines.withContext
 class MainFragment : BrowseSupportFragment() {
 
     companion object {
-        // İngilizce kategori isimlerini Türkçeye çeviren sözlük
         private val CATEGORY_TR = mapOf(
             "entertainment" to "Eğlence",
             "news" to "Haber",
@@ -57,6 +56,8 @@ class MainFragment : BrowseSupportFragment() {
         }
     }
 
+    private var allChannels: List<Channel> = emptyList()
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
@@ -65,35 +66,18 @@ class MainFragment : BrowseSupportFragment() {
         isHeadersTransitionOnBackEnabled = true
         brandColor = 0xFF0F0F23.toInt()
 
-            private fun setupEventListeners() {
-        onItemViewClickedListener = OnItemViewClickedListener { _, item, _, _ ->
-            if (item is Channel) {
-                val intent = Intent(activity, PlaybackActivity::class.java)
-                intent.putExtra("channel_url", item.streamUrl)
-                intent.putExtra("channel_name", item.name)
-                intent.putExtra("channel_id", item.id)
-                startActivity(intent)
-            }
-        }
-    }
-
-    private fun loadChannels() {
-        CoroutineScope(Dispatchers.Main).launch {
-            val channels = withContext(Dispatchers.IO) {
-                activity?.let { ChannelRepository.loadCustomChannels(it) }
-                    ?: ChannelRepository.loadDefaultChannels()
-            }
-            buildRows(channels)
-        }
+        setupEventListeners()
+        loadChannels()
     }
 
     private fun setupEventListeners() {
         onItemViewClickedListener = OnItemViewClickedListener { _, item, _, _ ->
             if (item is Channel) {
+                val startIndex = allChannels.indexOfFirst { it.id == item.id }
+                    .let { if (it >= 0) it else 0 }
                 val intent = Intent(activity, PlaybackActivity::class.java)
-                intent.putExtra("channel_url", item.streamUrl)
-                intent.putExtra("channel_name", item.name)
-                intent.putExtra("channel_id", item.id)
+                intent.putExtra("channel_list", ArrayList(allChannels))
+                intent.putExtra("start_index", startIndex)
                 startActivity(intent)
             }
         }
@@ -105,6 +89,7 @@ class MainFragment : BrowseSupportFragment() {
                 activity?.let { ChannelRepository.loadCustomChannels(it) }
                     ?: ChannelRepository.loadDefaultChannels()
             }
+            allChannels = channels
             buildRows(channels)
         }
     }
@@ -113,7 +98,6 @@ class MainFragment : BrowseSupportFragment() {
         val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
         val presenter = ChannelPresenter()
 
-        // Kanalları kategoriye (group-title) göre grupla, Türkçe isimlerle göster
         val grouped = channels.groupBy { translateCategory(it.group) }
 
         val favIds = activity?.let { ChannelRepository.getFavorites(it) } ?: emptySet()
