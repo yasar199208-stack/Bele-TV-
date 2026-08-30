@@ -2,7 +2,6 @@ package com.example.belestv.ui
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.leanback.app.BackgroundManager
 import androidx.leanback.app.BrowseSupportFragment
 import androidx.leanback.widget.*
 import com.example.belestv.data.Channel
@@ -20,14 +19,51 @@ import kotlinx.coroutines.withContext
  */
 class MainFragment : BrowseSupportFragment() {
 
+    companion object {
+        // İngilizce kategori isimlerini Türkçeye çeviren sözlük
+        private val CATEGORY_TR = mapOf(
+            "entertainment" to "Eğlence",
+            "news" to "Haber",
+            "general" to "Genel",
+            "sports" to "Spor",
+            "religious" to "Dini",
+            "kids" to "Çocuk",
+            "movies" to "Film",
+            "music" to "Müzik",
+            "documentary" to "Belgesel",
+            "education" to "Eğitim",
+            "lifestyle" to "Yaşam Tarzı",
+            "culture" to "Kültür",
+            "business" to "Ekonomi",
+            "science" to "Bilim",
+            "travel" to "Gezi",
+            "weather" to "Hava Durumu",
+            "auto" to "Otomobil",
+            "cooking" to "Yemek",
+            "classic" to "Klasik",
+            "comedy" to "Komedi",
+            "family" to "Aile",
+            "legislative" to "Meclis",
+            "local" to "Yerel",
+            "outdoor" to "Doğa",
+            "relax" to "Dinlenme",
+            "series" to "Dizi",
+            "shop" to "Alışveriş",
+            "undefined" to "Diğer"
+        )
+
+        private fun translateCategory(group: String): String {
+            return CATEGORY_TR[group.trim().lowercase()] ?: group
+        }
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
         title = "Beleş TV"
         headersState = HEADERS_ENABLED
         isHeadersTransitionOnBackEnabled = true
-                brandColor = 0xFF0F0F23.toInt()
-        badgeDrawable = null
+        brandColor = 0xFF0F0F23.toInt()
 
         setupEventListeners()
         loadChannels()
@@ -48,7 +84,6 @@ class MainFragment : BrowseSupportFragment() {
     private fun loadChannels() {
         CoroutineScope(Dispatchers.Main).launch {
             val channels = withContext(Dispatchers.IO) {
-                // Önce kullanıcının kendi eklediği liste var mı bak, yoksa varsayılanı yükle
                 activity?.let { ChannelRepository.loadCustomChannels(it) }
                     ?: ChannelRepository.loadDefaultChannels()
             }
@@ -60,10 +95,9 @@ class MainFragment : BrowseSupportFragment() {
         val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
         val presenter = ChannelPresenter()
 
-        // Kanalları kategoriye (group-title) göre grupla, düzenli satırlar oluştur
-        val grouped = channels.groupBy { it.group }
+        // Kanalları kategoriye (group-title) göre grupla, Türkçe isimlerle göster
+        val grouped = channels.groupBy { translateCategory(it.group) }
 
-        // Favoriler her zaman en üstte
         val favIds = activity?.let { ChannelRepository.getFavorites(it) } ?: emptySet()
         val favoriteChannels = channels.filter { it.id in favIds }
         if (favoriteChannels.isNotEmpty()) {
