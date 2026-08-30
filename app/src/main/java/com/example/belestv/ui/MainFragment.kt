@@ -65,8 +65,26 @@ class MainFragment : BrowseSupportFragment() {
         isHeadersTransitionOnBackEnabled = true
         brandColor = 0xFF0F0F23.toInt()
 
-        setupEventListeners()
-        loadChannels()
+            private fun setupEventListeners() {
+        onItemViewClickedListener = OnItemViewClickedListener { _, item, _, _ ->
+            if (item is Channel) {
+                val intent = Intent(activity, PlaybackActivity::class.java)
+                intent.putExtra("channel_url", item.streamUrl)
+                intent.putExtra("channel_name", item.name)
+                intent.putExtra("channel_id", item.id)
+                startActivity(intent)
+            }
+        }
+    }
+
+    private fun loadChannels() {
+        CoroutineScope(Dispatchers.Main).launch {
+            val channels = withContext(Dispatchers.IO) {
+                activity?.let { ChannelRepository.loadCustomChannels(it) }
+                    ?: ChannelRepository.loadDefaultChannels()
+            }
+            buildRows(channels)
+        }
     }
 
     private fun setupEventListeners() {
