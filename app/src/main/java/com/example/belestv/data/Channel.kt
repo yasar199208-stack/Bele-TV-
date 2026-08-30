@@ -7,7 +7,7 @@ data class Channel(
     val id: String,
     val name: String,
     val logoUrl: String?,
-    val group: String,        // Kategori: Haber, Spor, Ulusal, Belgesel, Çocuk...
+    val group: String,
     val streamUrl: String,
     var isFavorite: Boolean = false
-)
+) : java.io.Serializable
