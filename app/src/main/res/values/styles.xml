@@ -1,8 +1,11 @@
 <resources>
     <style name="AppTheme" parent="Theme.Leanback.Browse">
-        <item name="colorPrimary">#1A1A2E</item>
-        <item name="colorAccent">#E94560</item>
-        <item name="defaultBrandColor">#1A1A2E</item>
-        <item name="defaultSearchColor">#E94560</item>
+        <item name="colorPrimary">@color/brand_primary</item>
+        <item name="colorAccent">@color/brand_accent</item>
+        <item name="defaultBrandColor">@color/brand_dark</item>
+        <item name="defaultBrandColorDark">@color/brand_dark</item>
+        <item name="defaultSearchColor">@color/brand_accent</item>
+        <item name="defaultSearchIconColor">@color/brand_gold</item>
+        <item name="android:windowBackground">@color/brand_dark</item>
     </style>
 </resources>
