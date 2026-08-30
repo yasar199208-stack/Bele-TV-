@@ -32,9 +32,8 @@ class PlaybackActivity : ComponentActivity() {
 
         setContentView(R.layout.activity_playback)
 
-        @Suppress("UNCHECKED_CAST")
-        channels = (intent.getSerializableExtra("channel_list") as? ArrayList<Channel>) ?: arrayListOf()
-        val startIndex = intent.getIntExtra("start_index", 0)
+                channels = com.example.belestv.data.PlaybackState.channels
+        val startIndex = com.example.belestv.data.PlaybackState.startIndex
             .coerceIn(0, (channels.size - 1).coerceAtLeast(0))
 
         if (channels.isEmpty()) return
