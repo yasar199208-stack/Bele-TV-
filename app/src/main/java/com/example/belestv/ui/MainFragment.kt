@@ -26,7 +26,8 @@ class MainFragment : BrowseSupportFragment() {
         title = "Beleş TV"
         headersState = HEADERS_ENABLED
         isHeadersTransitionOnBackEnabled = true
-        brandColor = 0xFF1A1A2E.toInt()
+                brandColor = 0xFF0F0F23.toInt()
+        badgeDrawable = null
 
         setupEventListeners()
         loadChannels()
