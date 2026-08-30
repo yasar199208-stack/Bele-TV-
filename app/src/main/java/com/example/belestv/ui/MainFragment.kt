@@ -70,18 +70,18 @@ class MainFragment : BrowseSupportFragment() {
         loadChannels()
     }
 
-    private fun setupEventListeners() {
+        private fun setupEventListeners() {
         onItemViewClickedListener = OnItemViewClickedListener { _, item, _, _ ->
             if (item is Channel) {
                 val startIndex = allChannels.indexOfFirst { it.id == item.id }
                     .let { if (it >= 0) it else 0 }
+                com.example.belestv.data.PlaybackState.channels = allChannels
+                com.example.belestv.data.PlaybackState.startIndex = startIndex
                 val intent = Intent(activity, PlaybackActivity::class.java)
-                intent.putExtra("channel_list", ArrayList(allChannels))
-                intent.putExtra("start_index", startIndex)
                 startActivity(intent)
             }
         }
-    }
+        }
 
     private fun loadChannels() {
         CoroutineScope(Dispatchers.Main).launch {
