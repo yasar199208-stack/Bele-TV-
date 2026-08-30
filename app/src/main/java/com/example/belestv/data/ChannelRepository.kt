@@ -5,18 +5,25 @@ import android.content.Context
 /**
  * Kanal listesinin tek giriş noktası.
  *
- * VARSAYILAN LİSTE: Uygulama ilk açıldığında DEFAULT_PLAYLIST_URL'den
- * genel/yasal, şifresiz (free-to-air) kanalları çeker. Bu proje, örnek olarak
- * iptv-org (https://github.com/iptv-org/iptv) topluluk kaynağını referans alır —
- * bu proje ülkelere göre halka açık, lisans bilgisi etiketlenmiş listeler tutar.
- * Kendi listeni kullanmak istersen aşağıdaki URL'yi değiştir ya da
- * Ayarlar ekranından kendi M3U/Xtream bilgini gir.
+ * VARSAYILAN LİSTE: Uygulama ilk açıldığında birden fazla halka açık,
+ * yasal, şifresiz (free-to-air) kanal listesini birleştirir:
+ * Türkiye kanalları + uluslararası genel/haber/spor/film/belgesel kanalları.
+ * Kaynak: iptv-org (https://github.com/iptv-org/iptv) topluluk projesi.
+ * Yayınların güncelliğini ve yasallığını kendin teyit etmelisin.
+ * Kendi listeni kullanmak istersen Ayarlar ekranından kendi M3U/Xtream
+ * bilgini girebilirsin.
  */
 object ChannelRepository {
 
-    // Örnek: iptv-org projesinin Türkiye kanalları için topladığı liste.
-    // Yayınların güncelliğini ve yasallığını kendin teyit etmelisin.
-    const val DEFAULT_PLAYLIST_URL = "https://iptv-org.github.io/iptv/countries/tr.m3u"
+    // Birleştirilecek listeler: Türkiye + uluslararası kategoriler
+    private val DEFAULT_PLAYLIST_URLS = listOf(
+        "https://iptv-org.github.io/iptv/countries/tr.m3u",
+        "https://iptv-org.github.io/iptv/categories/general.m3u",
+        "https://iptv-org.github.io/iptv/categories/news.m3u",
+        "https://iptv-org.github.io/iptv/categories/sports.m3u",
+        "https://iptv-org.github.io/iptv/categories/movies.m3u",
+        "https://iptv-org.github.io/iptv/categories/documentary.m3u"
+    )
 
     private const val PREFS = "belestv_prefs"
     private const val KEY_FAVORITES = "favorites"
@@ -24,7 +31,24 @@ object ChannelRepository {
     private const val KEY_CUSTOM_M3U = "custom_m3u_url"
 
     fun loadDefaultChannels(): List<Channel> {
-        return M3uParser.parseFromUrl(DEFAULT_PLAYLIST_URL)
+        val allChannels = mutableListOf<Channel>()
+        val seenUrls = mutableSetOf<String>()
+
+        for (url in DEFAULT_PLAYLIST_URLS) {
+            try {
+                val channels = M3uParser.parseFromUrl(url)
+                for (channel in channels) {
+                    // Aynı yayın linkine sahip tekrar eden kanalları atla
+                    if (seenUrls.add(channel.streamUrl)) {
+                        allChannels.add(channel)
+                    }
+                }
+            } catch (e: Exception) {
+                // Bir liste çekilemezse diğerlerine devam et, uygulamayı çökertme
+            }
+        }
+
+        return allChannels
     }
 
     fun loadCustomChannels(context: Context): List<Channel>? {
