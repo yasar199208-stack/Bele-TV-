@@ -39,7 +39,8 @@ dependencies {
 
     // ExoPlayer (Media3) for stream playback, HLS/DASH/RTMP support
     implementation("androidx.media3:media3-exoplayer:1.4.0")
-    implementation("androidx.media3:media3-exoplayer-hls:1.4.0")
+        implementation("androidx.media3:media3-exoplayer-hls:1.4.0")
+    implementation("androidx.media3:media3-exoplayer-dash:1.4.0")
     implementation("androidx.media3:media3-ui:1.4.0")
     implementation("androidx.media3:media3-ui-leanback:1.4.0")
 
