@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0F0F23"
+    android:padding="24dp">
+
+    <EditText
+        android:id="@+id/search_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Kanal adı ara..."
+        android:textColorHint="#888888"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:inputType="text"
+        android:imeOptions="actionSearch"
+        android:background="#1A1A2E"
+        android:padding="16dp" />
+
+    <ListView
+        android:id="@+id/search_results"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp"
+        android:divider="#333344"
+        android:dividerHeight="1dp" />
+
+</LinearLayout>
