@@ -114,7 +114,6 @@ class MainFragment : BrowseSupportFragment() {
         if (favoriteChannels.isNotEmpty()) {
             val favAdapter = ArrayObjectAdapter(presenter)
             favAdapter.addAll(0, favoriteChannels)
-            rowsAdapter.add(ListRow(HeaderItem(0, "⭐ Favoriler")))
             rowsAdapter.add(ListRow(HeaderItem(0, "⭐ Favoriler"), favAdapter))
         }
 
