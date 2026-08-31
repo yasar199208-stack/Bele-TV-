@@ -5,7 +5,9 @@ import android.os.Bundle
 import androidx.leanback.app.BrowseSupportFragment
 import androidx.leanback.widget.*
 import com.example.belestv.data.Channel
+import com.example.belestv.data.ChannelCache
 import com.example.belestv.data.ChannelRepository
+import com.example.belestv.data.PlaybackState
 import com.example.belestv.player.PlaybackActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +17,7 @@ import kotlinx.coroutines.withContext
 /**
  * Uygulama açılışındaki ana ekran: sol üstte kategoriler (Ulusal, Haber, Spor...),
  * her kategori için yatay kayan gösterişli kanal kartları.
- * Tamamen kumanda/D-Pad ile gezilebilir (Leanback'in doğal davranışı).
+ * Sağ üstteki büyüteç ikonundan kanal adına göre arama yapılabilir.
  */
 class MainFragment : BrowseSupportFragment() {
 
@@ -66,22 +68,28 @@ class MainFragment : BrowseSupportFragment() {
         isHeadersTransitionOnBackEnabled = true
         brandColor = 0xFF0F0F23.toInt()
 
+        setupSearch()
         setupEventListeners()
         loadChannels()
     }
 
-        private fun setupEventListeners() {
+    private fun setupSearch() {
+        setOnSearchClickedListener {
+            startActivity(Intent(activity, SearchActivity::class.java))
+        }
+    }
+
+    private fun setupEventListeners() {
         onItemViewClickedListener = OnItemViewClickedListener { _, item, _, _ ->
             if (item is Channel) {
                 val startIndex = allChannels.indexOfFirst { it.id == item.id }
                     .let { if (it >= 0) it else 0 }
-                com.example.belestv.data.PlaybackState.channels = allChannels
-                com.example.belestv.data.PlaybackState.startIndex = startIndex
-                val intent = Intent(activity, PlaybackActivity::class.java)
-                startActivity(intent)
+                PlaybackState.channels = allChannels
+                PlaybackState.startIndex = startIndex
+                startActivity(Intent(activity, PlaybackActivity::class.java))
             }
         }
-        }
+    }
 
     private fun loadChannels() {
         CoroutineScope(Dispatchers.Main).launch {
@@ -90,6 +98,7 @@ class MainFragment : BrowseSupportFragment() {
                     ?: ChannelRepository.loadDefaultChannels()
             }
             allChannels = channels
+            ChannelCache.channels = channels
             buildRows(channels)
         }
     }
@@ -105,6 +114,7 @@ class MainFragment : BrowseSupportFragment() {
         if (favoriteChannels.isNotEmpty()) {
             val favAdapter = ArrayObjectAdapter(presenter)
             favAdapter.addAll(0, favoriteChannels)
+            rowsAdapter.add(ListRow(HeaderItem(0, "⭐ Favoriler")))
             rowsAdapter.add(ListRow(HeaderItem(0, "⭐ Favoriler"), favAdapter))
         }
 
